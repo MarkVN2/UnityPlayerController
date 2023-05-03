@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController2D controller; 
-    public Animator animator;       //Put the animator here to set animations
-    public float runSpeed = 30f;    // Speed of character while moving
-    bool jump = false;              // Verifies if character is jumping
-    bool crouch = false;            // Verifies if character is crouching
+    public CharacterController2D controller;    // 
+    public Animator animator;                   // sets the animator as Animator, use this for animations in the code.
+    public float runSpeed = 30f;                // speed of character while moving
+    bool jump = false;                          // boolean for jumping
+    bool crouch = false;                        // boolean for crouching    
     float horizontalMove = 0f;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -21,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     {
         horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
         animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
-
+          
         if(Input.GetButtonDown("Jump")){
            animator.SetBool("isJumping", true);
            jump = true;
@@ -37,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void OnLanding(){
-        animator.SetBool("IsJumping", false);
+        animator.SetBool("IsJumping", false);  
      }
      void FixedUpdate()
     {
