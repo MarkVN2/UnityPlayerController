@@ -7,16 +7,14 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Movement Settings")]
     
-    public float runSpeed = 60f;                // float for speed while moving 
-    public float crouchSpeed = 40f;             // float for speed while crouching
-    public float slideSpeed = 70f;              // float for speed while sliding
-    public float jumpForce = 8.0f;              // float for force when jumping 
+    public float moveSpeed = 60f;               // float for speed while moving 
+    public float slideSpeed = 1.5f;             // float for speed multiplier while sliding
+    public float jumpForce = 8.0f;              // 
     public float gravity = 20f;                 //
 
-    bool jump = false;                          // boolean for jumping
-    bool crouch = false;                        // boolean for crouching    
-    bool dash = false;                          // boolean for dashing
-    bool sliding = false;                       // boolean for sliding
+    bool isJumping = false;                          
+    bool isDashing = false;                          
+    bool isSliding = false;                         
     
     [Header("Camera Settings")]
 
@@ -24,7 +22,6 @@ public class PlayerMovement : MonoBehaviour
 
     public float lookSpeed = 2.0f;              // 
     public float lookXLimit = 45.0f;            // Limits X axis of the camera to a certain angle
-
 
     CharacterController charController;         //
 
@@ -34,18 +31,29 @@ public class PlayerMovement : MonoBehaviour
     [HideInInspector]
     public bool canMove = true;                 //
     bool inAir;                                 // 
+    private GameObject capsule;
 
     private void Start()
     {
- 
         charController = GetComponent<CharacterController>();       
-
-        Cursor.lockState = CursorLockMode.Locked;                   //Locks cursor
-        Cursor.visible = false;                                     //Hides Cursor
+        
+        Cursor.lockState = CursorLockMode.Locked;                 
+        Cursor.visible = false;                                    
     }
     private void Update()
     {
-        bool isSliding = Input.GetKey(KeyCode.LeftControl);
+        bool isCrouching = Input.GetKey(KeyCode.LeftControl);
+        bool isSliding = input.GetKey(KeyCode.LeftControl);
+
+        Vector3 forward = transform.transformDirection(Vector3.forward);
+        Vector3 right  = transform.transformDirection(Vector3.right);
+        
+        float curSpeedX = canMove ? (isSliding ? moveSpeed * slideSpeed : moveSpeed) * input.GetAxis("Vertical"): 0;
+        float curSpeedY = canMove ? (isSliding ? moveSpeed * slideSpeed : moveSpeed) * input.GetAxis("Horizontal"): 0;
+
+        float movementDirectionY = moveDirection.y;
+
+        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
         if (charController.isGrounded){            
             if(Input.GetButton("Jump")){
@@ -53,17 +61,19 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        Debug.Log(charController.isGrounded);
+        movementDirectionY  -= gravity  * Time.deltaTime;
+        moveDirection.y = movementDirectionY;
         
-       if (canMove)
+        //Camera rotation   
+        if (canMove)
         {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;                                 //
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;                                     //
 
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);                        //
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);                            //
 
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);           //
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);               //
 
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0); //
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);     //
         }
     }
 }
