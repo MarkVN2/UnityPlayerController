@@ -7,7 +7,6 @@ public class PlayerMovement : MonoBehaviour{
     //TODO
     /* 
         Create Dash;
-        Make collider and camera go down if Sliding;
     */
 
     public Animator animator;                   // sets the animator as Animator, use this for animations in the code.
@@ -15,16 +14,16 @@ public class PlayerMovement : MonoBehaviour{
     [Header("Movement Settings")]
     
     public float moveSpeed = 45f;               // float for speed while moving 
-    public float slideSpeed = 1.5f;             // float for speed multiplier while sliding
+    public float slideSpeed = 1.5f;             // float for  the extra speed while sliding
     public float jumpForce = 13f;               
     public float gravity = 20f;                 
     public float maxSpeedMultiplier = 2f;       
 
-    public float airAcceleration = 0.5f;
+    public float airAcceleration = 0.2f;
 
     float multiplier = 1f;
-    bool isJumping;                          
-    bool isDashing;                          
+
+    bool isJumping;                                        
     bool isSliding;                         
 
     [Header("Camera Settings")]
@@ -38,14 +37,15 @@ public class PlayerMovement : MonoBehaviour{
 
     [HideInInspector]
     public bool canMove = true;                 
-    bool inAir;                                  
+    bool inAir;         
+    Transform tr;                         
 
     private void Start(){
         charController = GetComponent<CharacterController>();       
-        
+        tr = GetComponent<Transform>();        
+
         Cursor.lockState = CursorLockMode.Locked;                 
         Cursor.visible = false;                          
-
     }
     private void Update(){
         
@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour{
 
         float movementDirectionY = moveDirection.y;
 
-        moveDirection = (forward *  (curSpeedX + (isSliding ? slideSpeed : 0)) ) + (right * curSpeedY ) ;
+        moveDirection = (forward *  (curSpeedX + (isSliding ? slideSpeed : 0 )) + (right * (curSpeedY + (isSliding ? slideSpeed : 0))));
 
         movementDirectionY  -= gravity  * Time.deltaTime;
         moveDirection.y = movementDirectionY;
@@ -69,7 +69,7 @@ public class PlayerMovement : MonoBehaviour{
         charController.Move(moveDirection * Time.deltaTime);
 
 
-         if (inAir == true ){
+        if (inAir == true ){
             if(maxSpeedMultiplier > multiplier){
                 multiplier += airAcceleration * Time.deltaTime ; 
             }
@@ -85,12 +85,20 @@ public class PlayerMovement : MonoBehaviour{
                 multiplier = 1f;
             }
         }
+        //
+        if (isSliding){
+            transform.localScale = new Vector3(1, 0.5f,1);
+        }
+        else{
+            transform.localScale = new Vector3(1,1,1);
+        }
+       
 
-        
         Debug.Log("Grounded:" + (charController.isGrounded));
         Debug.Log("In Air:" + (inAir));
         Debug.Log("Multiplier:" + (multiplier));
         Debug.Log("MaxMultiplier:" + (maxSpeedMultiplier));
+        
 
         //Camera rotation   
         if (canMove){
@@ -109,6 +117,5 @@ public class PlayerMovement : MonoBehaviour{
                 moveDirection.y  = jumpForce;
             }
           }
-       
         }
 }
