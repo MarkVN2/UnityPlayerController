@@ -7,7 +7,6 @@ public class PlayerMovement : MonoBehaviour{
     
     /* 
       TODO Create Dash;
-      TODO Fix Crouch state if under something;
     */
 
     public Animator animator;                   // sets the animator as Animator, use this for animations in the code.
@@ -17,6 +16,7 @@ public class PlayerMovement : MonoBehaviour{
     public float moveSpeed = 45f;               // float for speed while moving 
     public float slideSpeed = 1.5f;             // float for  the extra speed while sliding
     public float jumpForce = 13f;               
+
     public float dashForce = 2f;
     public float gravity = 20f;                 
     public float maxSpeedMultiplier = 2f;       
@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour{
 
     float dashCd = 2;
     float nextDash;
+    
     bool isJumping;                          
     bool isDashing;        
     bool ableDash;                  
@@ -62,19 +63,34 @@ public class PlayerMovement : MonoBehaviour{
         //Slide
             bool isSliding = Input.GetKey(KeyCode.LeftControl);
 
+    
+            //Setting raycast
+            
+            Vector3 top = tr.position + new Vector3(0,0.65f,0); // Character Top
+
+            Ray upRay = new Ray(top, new Vector3(0,1f,0));
+            RaycastHit hit;
 
             if (isSliding){
                 transform.localScale = new Vector3(1, 0.5f,1);
             }
             else{
-                if ((charController.collisionFlags & CollisionFlags.Above) != 0){  // !FIX THIS!
-                transform.localScale = new Vector3(1, 0.5f,1);
+                if (Physics.Raycast(upRay, out hit, 0.25f) ){ 
+                    transform.localScale = new Vector3(1, 0.5f,1);
+
+                    Debug.DrawRay(upRay.origin, upRay.direction * hit.distance , Color.red);
+                    print("Hit");
+            
                 }
                 else{
-                if(charController.collisionFlags  == CollisionFlags.None){
                     transform.localScale = new Vector3(1,1,1);
+                    
+                    Debug.DrawRay(upRay.origin, upRay.direction  , Color.blue);
+                    print("Not Hit");
                 }
-                }
+
+ 
+
             }
 
         // Air Acceleration
@@ -132,18 +148,13 @@ public class PlayerMovement : MonoBehaviour{
             }
 
             if (isDashing){
-           transform.position += forward * dashForce ;  // !FIX THIS!
-            }
+            string nothingisworkinghere = "nothing";  // !FIX THIS!
+            } 
 
 
 
         //Logs
-        Debug.Log("Grounded:" + (charController.isGrounded));
-        Debug.Log("In Air:" + (inAir));
-        Debug.Log("Multiplier:" + (multiplier));
-        Debug.Log("MaxMultiplier:" + (maxSpeedMultiplier));
-        Debug.Log("Dash-Time:" + (nextDash - dashCd));
-
+    
         //Camera rotation   
         if (canMove){
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;                                     
