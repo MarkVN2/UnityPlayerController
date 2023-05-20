@@ -66,7 +66,7 @@ public class PlayerMovement : MonoBehaviour{
     
             //Setting raycast
             
-            Vector3 top = tr.position + new Vector3(0,0.65f,0); // Character Top
+            Vector3 top = tr.position + new Vector3(0,0.50f,0); // Character Top
 
             Ray upRay = new Ray(top, new Vector3(0,1f,0));
             RaycastHit hit;
@@ -79,14 +79,14 @@ public class PlayerMovement : MonoBehaviour{
                     transform.localScale = new Vector3(1, 0.5f,1);
 
                     Debug.DrawRay(upRay.origin, upRay.direction * hit.distance , Color.red);
-                    print("Hit");
+                    // print("Hit");
             
                 }
                 else{
                     transform.localScale = new Vector3(1,1,1);
                     
                     Debug.DrawRay(upRay.origin, upRay.direction  , Color.blue);
-                    print("Not Hit");
+                    // print("Not Hit");
                 }
 
  
@@ -154,7 +154,12 @@ public class PlayerMovement : MonoBehaviour{
 
 
         //Logs
-    
+
+        Debug.Log("Grounded:" + (charController.isGrounded));
+        Debug.Log("In Air:" + (inAir));
+        Debug.Log("Multiplier:" + (multiplier));
+        Debug.Log("MaxMultiplier:" + (maxSpeedMultiplier));
+
         //Camera rotation   
         if (canMove){
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;                                     
